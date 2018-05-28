@@ -1,0 +1,43 @@
+#####
+if (!require(readr)) {
+  install.packages("readr");
+  if(!require(readr, character.only = TRUE)) stop("Package radr not found");
+}
+if (!require(dplyr)) {
+  install.packages("dplyr");
+  if(!require(dplyr, character.only = TRUE)) stop("Package dplyr not found");
+}
+#####
+file_read <- function(filename) {
+  if(!file.exists(filename))
+    stop("file '", filename, "' does not exist")
+  readr::read_tsv(filename)
+}
+
+get_date <- function(data) {
+  Shift <- -2400
+  T_Date0 <- ISOdate(-Shift, 1, 1, 0)
+  data %>%
+    dplyr::mutate(
+      T_Year = data$YEAR - Shift,
+      T_Date = ISOdate(T_Year, data$MONTH, data$DAY, 0),
+      T_Shift = (as.numeric(T_Date) - as.numeric(T_Date0)) / 3600 / 24,
+      Date = as.Date(T_Shift, "0000-01-01")
+    ) %>%
+    dplyr::select(-T_Year, -T_Date, -T_Shift)
+
+}
+
+eq_clean_data <- function(df) {
+  df %>%
+    dplyr::select(
+      "YEAR", "MONTH", "DAY",
+      "LATITUDE", "LONGITUDE", "LOCATION_NAME") %>%
+    dplyr::mutate(MONTH = ifelse(is.na(MONTH), 1, MONTH)) %>%
+    dplyr::mutate(DAY = ifelse(is.na(DAY), 1, DAY)) %>%
+    get_date() %>%
+    dplyr::select(-YEAR, -MONTH, -DAY)
+}
+
+NOAA <- file_read("inst\\extdata\\results.txt")
+NOAAC <- eq_clean_data(NOAA)
