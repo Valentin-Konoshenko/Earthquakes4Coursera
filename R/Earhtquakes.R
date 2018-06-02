@@ -23,6 +23,10 @@ get_date <- function(Y, M, D) {
   as.Date(T_Shift, "0000-01-01")
 }
 
+eq_location_clean <- function(location) {
+  stringr::str_to_title(sub("^.*: *", "", location))
+}
+
 eq_clean_data <- function(df) {
   df %>%
     dplyr::select(
@@ -30,7 +34,9 @@ eq_clean_data <- function(df) {
       "LATITUDE", "LONGITUDE", "LOCATION_NAME", "COUNTRY") %>%
     dplyr::mutate(MONTH = ifelse(is.na(MONTH), 1, MONTH)) %>%
     dplyr::mutate(DAY = ifelse(is.na(DAY), 1, DAY)) %>%
-    dplyr::mutate(DATE = get_date(Y = YEAR, M = MONTH, D = DAY)) %>%
+    dplyr::mutate(
+      DATE = get_date(Y = YEAR, M = MONTH, D = DAY),
+      LOCATION_NAME = eq_location_clean(LOCATION_NAME)) %>%
     dplyr::select(-YEAR, -MONTH, -DAY)
 }
 
