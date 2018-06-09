@@ -125,13 +125,13 @@ GeomTimelineLabel <-
     required_aes = c("x", "label"),
     default_aes = ggplot2::aes(y = 0, angle = 45),
     draw_key = ggplot2::draw_key_point,
-    draw_panel = function(data, panel_scales, coord) {
-      n_max <- 3
-      data <- data %>%
-        dplyr::group_by(y) %>%
-        dplyr::top_n(n = n_max, wt = size) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(group = row_number())
+    draw_panel = function(data, panel_scales, coord, n_max) {
+      if (!is.na(n_max))
+        data <- data %>%
+          dplyr::group_by(y) %>%
+          dplyr::top_n(n = n_max, wt = size) %>%
+          dplyr::ungroup()
+      data <- data %>% dplyr::mutate(group = row_number())
       coords <- coord$transform(data, panel_scales)
       line_coords <- coords %>%
         dplyr::mutate_(y = ~ y + 0.1) %>%
@@ -152,8 +152,8 @@ GeomTimelineLabel <-
 
 geom_timeline_label <-
   function(mapping = NULL, data = NULL, stat = "identity", position = "identity",
-           na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...) {
+           na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, n_max = NA, ...) {
     ggplot2::layer(geom = GeomTimelineLabel, mapping = mapping, data = data,
                    stat = stat, position = position, show.legend = show.legend,
-                   inherit.aes = inherit.aes, params = list(na.rm = na.rm, ...))
-}
+                   inherit.aes = inherit.aes,
+                   params = list(na.rm = na.rm, n_max = n_max, ...))}

@@ -95,3 +95,19 @@ NOAAC %>%
   theme_timeline() +
   labs(size = "Richter scale value", colour = "# deaths") +
   geom_timeline_label(aes(label = LOCATION_NAME))
+
+NOAAC %>%
+  dplyr::filter(COUNTRY %in% c("USA", "CHINA"),
+                between(lubridate::year(DATE),  2010, 2011)) %>%
+  ggplot(aes(x = DATE,
+             y = COUNTRY,
+             color = DEATHS,
+             size = EQ_PRIMARY
+  )) +
+  geom_timeline(xmin = eq_get_date(2010, 01, 01),
+                xmax = as.Date("2011-12-31"),
+                alpha = 1
+  ) +
+  theme_timeline() +
+  labs(size = "Richter scale value", colour = "# deaths") +
+  geom_timeline_label(aes(label = LOCATION_NAME), n_max = 2)
