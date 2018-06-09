@@ -48,48 +48,68 @@ eq_clean_data <- function(df) {
       LOCATION_NAME = eq_location_clean(LOCATION_NAME),
       DEATHS = coalesce(as.numeric(DEATHS), NA_real_),
       EQ_MAG_MS = coalesce(as.numeric(EQ_MAG_MS), NA_real_),
+      EQ_PRIMARY = coalesce(as.numeric(EQ_PRIMARY), NA_real_),
       COUNTRY = as.factor(COUNTRY)) %>%
     dplyr::select(
       "DATE", "LATITUDE", "LONGITUDE", "LOCATION_NAME", "COUNTRY",
-      "DEATHS", "EQ_MAG_MS")
+      "DEATHS", "EQ_MAG_MS", "EQ_PRIMARY")
 }
 
 NOAA <- file_read("inst\\extdata\\results.txt")
 NOAAC <- eq_clean_data(NOAA)
 
 #####
+theme_timeline <- function() {
+  ggplot2::theme_bw() +
+    ggplot2::theme(
+      legend.position='bottom',
+      legend.title = ggplot2::element_text(face = "bold" ),
+      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.border = ggplot2::element_blank(),
+      axis.title.y = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_line(size = 1),
+      axis.ticks.y = ggplot2::element_blank(),
+      axis.line.x  = ggplot2::element_line(size = 1))
+}
 
 GeomTimeline <-
   ggplot2::ggproto(
     "GeomTimeline", ggplot2::Geom,
     required_aes = c("xmin", "xmax"),
-    default_aes = ggplot2::aes(shape = 19, colour = NA,
-                               alpha = 0.5##, size = 10##, size = 5
-                               ),
+    default_aes = ggplot2::aes(shape = 19, colour = "black", fill = "white",
+                               alpha = 0.5, stroke = 0.5, size = 3, y = 0),
     draw_key = ggplot2::draw_key_point,
-    draw_group =
-      function(data, panel_scales, coord) {
+    draw_panel =
+      function(data, panel_scales, coord, na.rm = FALSE) {
         xmin <- as.numeric(data[1, "xmin"])
         xmax <- as.numeric(data[1, "xmax"])
-        str(data)
-        data_filtered <-
-          data[data$x >= xmin & data$x <= xmax & !is.na(data$x), ] %>%
-          dplyr::mutate(size = if_else(is.na(size), 1, size))
-        str(data_filtered)
-        coords <- coord$transform(data_filtered, panel_scales)
-        str(coords)
-       gp <<- grid::gpar(
-            alpha = coords$alpha,
-          col = coords$colour,
-          fontsize = grid::unit(coords$size * 2, "npc")
-            ##1 *
-            ##ifelse(is.na(coords$size), 1, coords$size)
-        )
-        grid::pointsGrob(coords$x, coords$y, pch = coords$shape
-          ,gp = gp
-          )
+        data <- data[data$x >= xmin & data$x <= xmax & !is.na(data$x), ]
+        coords <- coord$transform(data, panel_scales)
+        if (nrow(data) == 0) {ggplot2::zeroGrob()}
+        else {
+          eq_point <-
+            grid::pointsGrob(
+              x = coords$x,
+              y = coords$y,
+              pch = coords$shape,
+              size = grid::unit(coords$size / 4, "char"),
+              gp = grid::gpar(col = coords$colour,
+                              alpha = coords$alpha))
+          eq_line <- grid::segmentsGrob(
+            x0 = 0,
+            x1 = 1,
+            y0 = coords$y,
+            y1 = coords$y,
+            default.units = "native",
+            gp = grid::gpar(
+              size = 0.5,
+              alpha = coords$alpha * 0.5,
+              col = "grey"))
+          timeline <- grid::gTree(children = grid::gList(eq_line, eq_point))
+        }
       }
-    )
+  )
 #####
 geom_timeline <-
   function(mapping = NULL, data = NULL, stat = "identity",
