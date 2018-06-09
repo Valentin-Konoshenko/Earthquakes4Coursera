@@ -1,4 +1,4 @@
-#####
+##### checks ####
 if (!require(readr)) {
   install.packages("readr");
   if(!require(readr, character.only = TRUE)) stop("Package readr not found");
@@ -19,7 +19,7 @@ if (!require(grid)) {
   install.packages("grid");
   if(!require(grid, character.only = TRUE)) stop("Package grid not found");
 }
-#####
+##### load data ####
 file_read <- function(filename) {
   if(!file.exists(filename))
     stop("file '", filename, "' does not exist")
@@ -58,7 +58,7 @@ eq_clean_data <- function(df) {
 NOAA <- file_read("inst\\extdata\\results.txt")
 NOAAC <- eq_clean_data(NOAA)
 
-#####
+##### time line ####
 theme_timeline <- function() {
   ggplot2::theme_bw() +
     ggplot2::theme(
@@ -110,7 +110,6 @@ GeomTimeline <-
         }
       }
   )
-#####
 geom_timeline <-
   function(mapping = NULL, data = NULL, stat = "identity",
            position = "identity", show.legend = NA, na.rm = FALSE,
@@ -119,38 +118,37 @@ geom_timeline <-
           position = position, show.legend = show.legend, inherit.aes = inherit.aes,
           params = list(na.rm = na.rm, xmin = xmin, xmax = xmax, ...))
   }
-
+##### time line label ####
 GeomTimelineLabel <-
   ggplot2::ggproto(
-    "GeomTimelineLabel",
-    ggplot2::Geom,
+    "GeomTimelineLabel", ggplot2::Geom,
     required_aes = c("x", "label"),
     default_aes = ggplot2::aes(y = 0, angle = 45),
     draw_key = ggplot2::draw_key_point,
     draw_panel = function(data, panel_scales, coord) {
-    coords <- coord$transform(data, panel_scales)
-    line_coords <- coords %>%
-      dplyr::mutate_(y = ~ y + 0.1) %>%
-      dplyr::bind_rows(coords) %>%
-      dplyr::arrange(x) %>%
-      dplyr::mutate_(group = ~rep(1:nrow(coords), each = 2))
-    text <- grid::textGrob(
-      label = coords$label,
-      x = coords$x,
-      y = coords$y + 0.1,
-      rot = 45,
-      just = c("left", "center"),
-      gp = grid::gpar(
-        col = "black",
-        fontsize = 4 * .pt))
-    lines <- grid::polylineGrob(
-      x = line_coords$x,
-      y = line_coords$y,
-      id = line_coords$group,
-      gp = grid::gpar(
-        col = alpha("gray20", 0.25),
-        lwd = 0.5 * .pt))
-    grid::grobTree(lines, text)})
+      n_max <- 3
+      data <- data %>%
+        dplyr::group_by(y) %>%
+        dplyr::top_n(n = n_max, wt = size) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(group = row_number())
+      coords <- coord$transform(data, panel_scales)
+      line_coords <- coords %>%
+        dplyr::mutate_(y = ~ y + 0.1) %>%
+        dplyr::bind_rows(coords)
+      text <- grid::textGrob(
+        label = coords$label,
+        x = coords$x,
+        y = coords$y + 0.1,
+        rot = 45,
+        just = c("left", "center"),
+        gp = grid::gpar(col = "black", fontsize = 4 * .pt))
+      lines <- grid::polylineGrob(
+        x = line_coords$x,
+        y = line_coords$y,
+        id = line_coords$group,
+        gp = grid::gpar(col = alpha("gray20", 0.25), lwd = 0.5 * .pt))
+      grid::grobTree(lines, text)})
 
 geom_timeline_label <-
   function(mapping = NULL, data = NULL, stat = "identity", position = "identity",
