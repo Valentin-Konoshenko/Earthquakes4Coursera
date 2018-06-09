@@ -78,7 +78,7 @@ GeomTimeline <-
     "GeomTimeline", ggplot2::Geom,
     required_aes = c("xmin", "xmax"),
     default_aes = ggplot2::aes(shape = 19, colour = "black", fill = "white",
-                               alpha = 0.5, stroke = 0.5, size = 3, y = 0),
+      alpha = 0.5, stroke = 0.5, size = 3, y = 0),
     draw_key = ggplot2::draw_key_point,
     draw_panel =
       function(data, panel_scales, coord, na.rm = FALSE) {
@@ -119,38 +119,43 @@ geom_timeline <-
           position = position, show.legend = show.legend, inherit.aes = inherit.aes,
           params = list(na.rm = na.rm, xmin = xmin, xmax = xmax, ...))
   }
-#####
-NOAAC %>%
-  dplyr::filter(COUNTRY %in% c("CHINA", "USA"),
-                between(lubridate::year(DATE),  2010, 2011)) %>%
-  ggplot(aes(x = DATE, y = COUNTRY, color = DEATHS, size = EQ_MAG_MS
-             )) +
-  geom_timeline(
-    xmin = eq_get_date(2010, 1, 1),
-    xmax = eq_get_date(2011, 12, 31))
 
-NOAAC %>%
-  dplyr::filter(COUNTRY %in% c("CHINA"),
-                between(lubridate::year(DATE), 2010, 2011)) %>%
-  ggplot(aes(x = DATE, y = COUNTRY, color = DEATHS
-             )) +
-  geom_timeline(
-    xmin = eq_get_date(2010, 1, 1),
-    xmax = eq_get_date(2011, 12, 31))
+GeomTimelineLabel <-
+  ggplot2::ggproto(
+    "GeomTimelineLabel",
+    ggplot2::Geom,
+    required_aes = c("x", "label"),
+    default_aes = ggplot2::aes(y = 0, angle = 45),
+    draw_key = ggplot2::draw_key_point,
+    draw_panel = function(data, panel_scales, coord) {
+    coords <- coord$transform(data, panel_scales)
+    line_coords <- coords %>%
+      dplyr::mutate_(y = ~ y + 0.1) %>%
+      dplyr::bind_rows(coords) %>%
+      dplyr::arrange(x) %>%
+      dplyr::mutate_(group = ~rep(1:nrow(coords), each = 2))
+    text <- grid::textGrob(
+      label = coords$label,
+      x = coords$x,
+      y = coords$y + 0.1,
+      rot = 45,
+      just = c("left", "center"),
+      gp = grid::gpar(
+        col = "black",
+        fontsize = 4 * .pt))
+    lines <- grid::polylineGrob(
+      x = line_coords$x,
+      y = line_coords$y,
+      id = line_coords$group,
+      gp = grid::gpar(
+        col = alpha("gray20", 0.25),
+        lwd = 0.5 * .pt))
+    grid::grobTree(lines, text)})
 
-NOAAC %>%
-  dplyr::filter(COUNTRY %in% c("CHINA", "USA", "IRAN"),
-                between(lubridate::year(DATE), 2010, 2011)) %>%
-  ggplot(aes(x = DATE, y = COUNTRY, color = DEATHS, size = EQ_MAG_MS)) +
-  geom_point(alpha = 0.5)
-#####direct####
-NOAAC %>%
-  ggplot(aes(x = DATE, color = DEATHS, size = EQ_MAG_MS)) +
-  geom_point(alpha = 1, y = 0) +
-  xlim(eq_get_date(1988, 12, 1), eq_get_date(1988, 12, 31))
-
-NOAAC %>% filter(lubridate::year(DATE) == 1988) %>%
-  ggplot(aes(x = DATE, color = DEATHS, size = EQ_MAG_MS)) +
-  geom_segment(aes(x = min(DATE), xend = max(DATE), y = 0, yend = 0),
-               color = "green", alpha = 0.5, size = 1) +
-  geom_point(alpha = 0.5, y = 0)
+geom_timeline_label <-
+  function(mapping = NULL, data = NULL, stat = "identity", position = "identity",
+           na.rm = FALSE, show.legend = NA, inherit.aes = TRUE, ...) {
+    ggplot2::layer(geom = GeomTimelineLabel, mapping = mapping, data = data,
+                   stat = stat, position = position, show.legend = show.legend,
+                   inherit.aes = inherit.aes, params = list(na.rm = na.rm, ...))
+}
