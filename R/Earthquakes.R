@@ -70,21 +70,19 @@ theme_timeline <- function() {
       axis.title.y = ggplot2::element_blank(),
       axis.ticks.x = ggplot2::element_line(size = 1),
       axis.ticks.y = ggplot2::element_blank(),
-      axis.line.x  = ggplot2::element_line(size = 1))
-}
-
+      axis.line.x  = ggplot2::element_line(size = 1))}
 GeomTimeline <-
   ggplot2::ggproto(
     "GeomTimeline", ggplot2::Geom,
-    required_aes = c("xmin", "xmax"),
+    required_aes = "x",
     default_aes = ggplot2::aes(shape = 19, colour = "black", fill = "white",
-      alpha = 0.5, stroke = 0.5, size = 3, y = 0),
+                               alpha = 0.5, stroke = 0.5, size = 3, y = 0),
     draw_key = ggplot2::draw_key_point,
     draw_panel =
-      function(data, panel_scales, coord, na.rm = FALSE) {
-        xmin <- as.numeric(data[1, "xmin"])
-        xmax <- as.numeric(data[1, "xmax"])
-        data <- data[data$x >= xmin & data$x <= xmax & !is.na(data$x), ]
+      function(data, panel_scales, coord, na.rm = FALSE, xmin, xmax) {
+        data <- data[
+          (is.na(xmin) | data$x >= as.numeric(xmin)) &
+            (is.na(xmax) | data$x <= as.numeric(xmax)), ]
         coords <- coord$transform(data, panel_scales)
         if (nrow(data) == 0) {ggplot2::zeroGrob()}
         else {
@@ -106,18 +104,14 @@ GeomTimeline <-
               size = 0.5,
               alpha = coords$alpha * 0.5,
               col = "grey"))
-          timeline <- grid::gTree(children = grid::gList(eq_line, eq_point))
-        }
-      }
-  )
+          timeline <- grid::gTree(children = grid::gList(eq_line, eq_point))}})
 geom_timeline <-
   function(mapping = NULL, data = NULL, stat = "identity",
            position = "identity", show.legend = NA, na.rm = FALSE,
-           inherit.aes = TRUE, xmin, xmax, ...) {
+           inherit.aes = TRUE, xmin = NA, xmax = NA, ...) {
     layer(geom = GeomTimeline, mapping = mapping, data = data, stat = stat,
           position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-          params = list(na.rm = na.rm, xmin = xmin, xmax = xmax, ...))
-  }
+          params = list(na.rm = na.rm, xmin = xmin, xmax = xmax, ...))}
 ##### time line label ####
 GeomTimelineLabel <-
   ggplot2::ggproto(

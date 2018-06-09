@@ -78,8 +78,7 @@ NOAAC %>%
   theme_timeline() +
   labs(size = "Richter scale value", colour = "# deaths") +
   geom_timeline_label(aes(label = LOCATION_NAME))
-
-
+## 6 ####
 NOAAC %>%
   dplyr::filter(COUNTRY %in% c("USA", "CHINA"),
                 between(lubridate::year(DATE),  2010, 2011)) %>%
@@ -95,7 +94,7 @@ NOAAC %>%
   theme_timeline() +
   labs(size = "Richter scale value", colour = "# deaths") +
   geom_timeline_label(aes(label = LOCATION_NAME))
-
+## 7 ####
 NOAAC %>%
   dplyr::filter(COUNTRY %in% c("USA", "CHINA"),
                 between(lubridate::year(DATE),  2010, 2011)) %>%
