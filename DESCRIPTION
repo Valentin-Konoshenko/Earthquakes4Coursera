@@ -1,9 +1,21 @@
 Package: Earthquakes4Coursera
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: Visualization of the earthquakes from the NOAA database
+Version: 0.0.1.0001
+Authors@R: person("Valentin", "Konoshenko", email = "konoshenkovalent@ukr.net", role = c("aut", "cre"))
+Description: The package has been developed in a context of the Coursera's course 
+  "Mastering Software Development in R Capstone". It visualizes significant 
+  earthquakes around the world registered in NOAA database. 
+  Two kind of plots are used to visualize the data:
+  the first exploits time lines to show earthquakes in time and  
+  the second just plots them on the map
 Depends: R (>= 3.4.3)
-License: What license is it under?
+License: CC0
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.0.1
+Imports: dplyr,
+    ggplot2,
+    grid,
+    leaflet,
+    lubridate,
+    readr
