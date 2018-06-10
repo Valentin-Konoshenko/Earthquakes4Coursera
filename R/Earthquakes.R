@@ -19,6 +19,10 @@ if (!require(grid)) {
   install.packages("grid");
   if(!require(grid, character.only = TRUE)) stop("Package grid not found");
 }
+if (!require(leaflet)) {
+  install.packages("leaflet");
+  if(!require(leaflet, character.only = TRUE)) stop("Package leaflet not found");
+}
 ##### load data ####
 file_read <- function(filename) {
   if(!file.exists(filename))
@@ -49,10 +53,12 @@ eq_clean_data <- function(df) {
       DEATHS = coalesce(as.numeric(DEATHS), NA_real_),
       EQ_MAG_MS = coalesce(as.numeric(EQ_MAG_MS), NA_real_),
       EQ_PRIMARY = coalesce(as.numeric(EQ_PRIMARY), NA_real_),
-      COUNTRY = as.factor(COUNTRY)) %>%
+      COUNTRY = as.factor(COUNTRY),
+      LATITUDE = as.numeric(LATITUDE),
+      LONGITUDE = as.numeric(LONGITUDE)) %>%
     dplyr::select(
       "DATE", "LATITUDE", "LONGITUDE", "LOCATION_NAME", "COUNTRY",
-      "DEATHS", "EQ_MAG_MS", "EQ_PRIMARY")
+      "DEATHS", "TOTAL_DEATHS", "EQ_MAG_MS", "EQ_PRIMARY")
 }
 
 NOAA <- file_read("inst\\extdata\\results.txt")

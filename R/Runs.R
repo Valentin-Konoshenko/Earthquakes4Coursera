@@ -87,8 +87,8 @@ NOAAC %>%
              color = DEATHS,
              size = EQ_PRIMARY
   )) +
-  geom_timeline(xmin = eq_get_date(2010, 01, 01),
-                xmax = as.Date("2011-12-31"),
+  geom_timeline(##xmin = eq_get_date(2010, 01, 01),
+                ##xmax = as.Date("2011-12-31"),
                 alpha = 1
   ) +
   theme_timeline() +
@@ -110,3 +110,18 @@ NOAAC %>%
   theme_timeline() +
   labs(size = "Richter scale value", colour = "# deaths") +
   geom_timeline_label(aes(label = LOCATION_NAME), n_max = 2)
+## 8 ####
+NOAAC %>%
+  dplyr::filter(COUNTRY == "CHINA" & lubridate::year(DATE) >= 2000) %>%
+  eq_map(annot_col = "DATE")
+
+NOAAC %>%
+  dplyr::filter(COUNTRY == "CHINA" & lubridate::year(DATE) >= 1976 &
+                  lubridate::year(DATE) <= 1976) %>%
+  dplyr::mutate(popup_text = eq_create_label(.)) %>%
+  eq_map(annot_col = "popup_text")
+
+NOAAC %>%
+  dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2014) %>%
+  dplyr::mutate(popup_text = eq_create_label(.)) %>%
+  eq_map(annot_col = "popup_text")
