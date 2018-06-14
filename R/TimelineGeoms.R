@@ -2,7 +2,7 @@
 theme_timeline <- function() {
   ggplot2::theme_bw() +
     ggplot2::theme(
-      legend.position='bottom',
+      legend.position = 'bottom',
       legend.title = ggplot2::element_text(face = "bold" ),
       panel.grid.major = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank(),
