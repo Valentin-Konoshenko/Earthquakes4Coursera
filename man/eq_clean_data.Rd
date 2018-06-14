@@ -7,10 +7,10 @@
 eq_clean_data(df)
 }
 \arguments{
-\item{df}{a data frame to clean.}
+\item{df}{a data frame to clean}
 }
 \value{
-Cleaned data frame.
+Cleaned data frame
 }
 \description{
 It's expected that the data frame is produced by the \code{\link{file_read}}
@@ -24,4 +24,5 @@ function. The cleaning is performed in the following way:
 }
 \examples{
  file_read() \%>\% eq_clean_data()
+
 }

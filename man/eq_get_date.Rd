@@ -26,4 +26,5 @@ from real ones.
 \examples{
  eq_get_date(-100, 12, 31);
  eq_get_date(2000);
+
 }
