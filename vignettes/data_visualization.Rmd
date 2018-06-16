@@ -1,0 +1,157 @@
+---
+title: "Data visualization"
+author: "Valentin Konoshenko"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The package enables two kind of vizualizations:
+
+* Time lines to show earthquakes in time and 
+* Mapping to visualize earthquakes in space
+
+## Time lines
+
+There are several objects which support this kind of visualization:
+
+1. `geom_timeline()` - the geometry which allows plotting time lines
+2. `geom_timeline_label()` - the geometry to annotate remarkable cases
+3. `theme_timeline()` - quite a minimalistic theme to satisfy the assignment requirements for displaying data
+
+### `theme_timeline()` - Follows the style of the assignmen
+
+Just use it in order to follow the style of the Coursera's assignment
+
+### `geom_timeline()` - Plots time lines
+
+This geom plots a time line of earthquakes ranging from `xmin` to `xmax` dates (which are optional) with a point for each earthquake. Optional aesthetics also include `color`, `size`, and `alpha` (for transparency). The required `x` aesthetic is a date and an optional `y` aesthetic is a factor indicating some stratification in which case multiple time lines will be plotted for each level of the factor (e.g. country).
+
+### `geom_timeline_label` - Annotates the most prominent cases 
+
+This geom adds a vertical line to each data point with a text annotation (e.g. the location of the earthquake) attached to each line. There is an option to subset to `n_max` number of earthquakes, where we take the `n_max` largest (by magnitude) earthquakes.
+Aesthetics are `x`, which is the date of the earthquake and `label` which takes the column name from which annotations will be obtained. If `n_max` is omitted, each earthquake is annotated
+
+***
+
+Let's consider some examples.
+
+```{r, echo = c(-1, -2, -3), message = FALSE, warning = FALSE, fig.show='asis', fig.width = 7, fig.height = 3.5, fig.cap = "Without stratification by country"}
+library(Earthquakes4Coursera)
+library(dplyr)
+library(ggplot2)
+NOAAC <- file_read() %>% eq_clean_data()
+NOAAC %>%
+  dplyr::filter(COUNTRY == "USA",
+                between(lubridate::year(DATE), 2000, 2017)) %>%
+  ggplot(aes(x = DATE, 
+             color = DEATHS, 
+             size = EQ_PRIMARY)) +
+  geom_timeline() +
+  theme_timeline() +
+  labs(size = "Richter scale value", colour = "# deaths") +
+  geom_timeline_label(aes(label = LOCATION_NAME), n_max = 5)
+```
+
+I cannot come up with any reason why we may want to filter data inside the geom rather than a step before like we did for year and country, but let's check hoq it works. I'm going to add an additional filtering using the xmin and xmax parameters of the geom:
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, fig.show='asis', fig.width = 7, fig.height = 3.5, fig.cap = "With additional filtering by date ranging from `xmin` to `xmax`"}
+NOAAC %>%
+  dplyr::filter(COUNTRY == "USA",
+                between(lubridate::year(DATE), 2000, 2017)) %>%
+  ggplot(aes(x = DATE, 
+             color = DEATHS, 
+             size = EQ_PRIMARY)) +
+  geom_timeline(xmin = eq_get_date(2002, 8, 1),
+                xmax = eq_get_date(2014, 12, 31)) +
+  theme_timeline() +
+  labs(size = "Richter scale value", colour = "# deaths") +
+  geom_timeline_label(aes(label = LOCATION_NAME), n_max = 5)
+```
+
+We can see that the earthquakes beyond the bounds of [`nmin`, `nmax`] are not shown.
+
+Now let's stratify the earthquakes by country and set `n_max` = 3
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, fig.show='asis', fig.width = 7, fig.height = 7, fig.cap = "With additional stratification by country"}
+NOAAC %>%
+  dplyr::filter(COUNTRY %in% c("USA", "CHINA"),
+                between(lubridate::year(DATE),  2008, 2011)) %>%
+  ggplot(aes(x = DATE,
+             y = COUNTRY,
+             color = DEATHS,
+             size = EQ_PRIMARY)) +
+  geom_timeline() +
+  theme_timeline() +
+  labs(size = "Richter scale value", color = "# deaths") +
+  geom_timeline_label(aes(label = LOCATION_NAME), n_max = 3)
+```
+
+Just for fun (actually to show how it works with BC dates)
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, fig.show='asis', fig.width = 7, fig.height = 8, fig.cap = "BC dates"}
+NOAAC %>%
+  dplyr::filter(
+    COUNTRY %in% c("ISRAEL", "ITALY", "CHINA"),
+    between(lubridate::year(DATE),  -70, 70)) %>%
+  ggplot(aes(x = DATE,
+             y = COUNTRY,
+             color = DEATHS,
+             size = EQ_PRIMARY)) +
+  geom_timeline() +
+  theme_timeline() +
+  labs(size = "Richter scale value", colour = "# deaths") +
+  geom_timeline_label(aes(label = LOCATION_NAME))
+```
+
+## Mapping
+
+There are several objects which support this kind of visualization:
+
+1. `eq_map()` - the main function to visualize data on a map
+2. `eq_create_label()` - assembles an annotation text for a pop-up
+
+### `eq_create_label()` - Creates an annotation text for a pop-up
+
+The function combines the following information about an earthquake:
+
+* Location
+* Magnitude
+* Total number of deaths
+
+If an earthquake is missing values for any of these items, it is skipped for that element of the tag.
+
+### `eq_map()` - Visualizes earthquakes on a map
+
+The function takes an argument `eq_data` containing the data frame with earthquakes to visualize. The function maps the epicenters `LATITUDE`/`LONGITUDE` and annotates each point with in pop up window containing annotation data stored in a column of the data frame.
+The user is able to choose which column to use for the annotation in the pop-up with a function argument named `annot_col`. Each earthquake is shown with a circle whose radius is proportional to the earthquake's magnitude.
+
+***
+
+Let's show on the map the earthquake in Mexico that have happen since 2000. Just chose one of the columns (let say, `DATE`) as an annotation text to show in a pop-up window. 
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, fig.show='asis', fig.width = 7, fig.height = 4, fig.cap = "Earthquakes are annotated with `DATE`"}
+NOAAC %>%
+  dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2000) %>%
+  eq_map(annot_col = "DATE")
+```
+
+Let's now show the earthquakes that have happened in Russia since 2010. In this time we are going to use `eq_create_label()` to annotate earthqakes with additional information about "Location", "Total deaths", and "Magnitude"
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, fig.show='asis', fig.width = 7, fig.height = 4, fig.cap = "Pop-ups contain information about Location, Total deaths, and Magnitude"}
+NOAAC %>%
+  dplyr::filter(COUNTRY == "RUSSIA" & lubridate::year(DATE) >= 2010) %>%
+  dplyr::mutate(popup_text = eq_create_label(.)) %>%
+  eq_map(annot_col = "popup_text")
+```

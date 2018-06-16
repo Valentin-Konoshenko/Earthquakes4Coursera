@@ -14,7 +14,11 @@
 #' @export
 #'
 #' @importFrom readr read_delim
-file_read <- function(filename = "inst\\extdata\\results.txt") {
+file_read <- function(filename = "") {
+  if (filename == "")
+    filename <- system.file("extdata",
+                            "results.txt",
+                            package = "Earthquakes4Coursera")
   if(!file.exists(filename))
     stop("file '", filename, "' does not exist")
   readr::read_delim(filename, delim = "\t")
@@ -90,7 +94,7 @@ eq_location_clean <- function(location) {
 #' @examples
 #'  file_read() %>% eq_clean_data()
 #'
-#' @importFrom dplyr mutate select %>%
+#' @importFrom dplyr mutate select coalesce %>%
 #'
 #' @export
 eq_clean_data <- function(df) {
@@ -98,9 +102,9 @@ eq_clean_data <- function(df) {
     dplyr::mutate(
       DATE = eq_get_date(Y = YEAR, M = MONTH, D = DAY),
       LOCATION_NAME = eq_location_clean(LOCATION_NAME),
-      DEATHS = coalesce(as.numeric(DEATHS), NA_real_),
-      EQ_MAG_MS = coalesce(as.numeric(EQ_MAG_MS), NA_real_),
-      EQ_PRIMARY = coalesce(as.numeric(EQ_PRIMARY), NA_real_),
+      DEATHS = dplyr::coalesce(as.numeric(DEATHS), NA_real_),
+      EQ_MAG_MS = dplyr::coalesce(as.numeric(EQ_MAG_MS), NA_real_),
+      EQ_PRIMARY = dplyr::coalesce(as.numeric(EQ_PRIMARY), NA_real_),
       COUNTRY = as.factor(COUNTRY),
       LATITUDE = as.numeric(LATITUDE),
       LONGITUDE = as.numeric(LONGITUDE)) %>%

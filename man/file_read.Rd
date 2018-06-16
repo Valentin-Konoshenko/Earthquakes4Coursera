@@ -4,7 +4,7 @@
 \alias{file_read}
 \title{Read earthquake related data from a file}
 \usage{
-file_read(filename = "inst\\\\extdata\\\\results.txt")
+file_read(filename = "")
 }
 \arguments{
 \item{filename}{A name of the file to read. By default read the data

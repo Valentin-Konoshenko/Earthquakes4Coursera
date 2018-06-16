@@ -12,7 +12,7 @@ eq_map(eq_data, annot_col)
 \item{annot_col}{The column name which should be used for annotation purpose}
 }
 \description{
-The function takes an argument data containing the filtered data frame
+The function takes an argument \code{eq_data} containing the filtered data frame
 with earthquakes to visualize. The function maps the epicenters
 (\code{LATITUDE}/\code{LONGITUDE}) and annotates each point with in pop up window
 containing annotation data stored in a column of the data frame.

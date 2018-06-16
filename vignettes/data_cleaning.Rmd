@@ -1,0 +1,75 @@
+---
+title: "Data cleaning"
+author: "Valentin Konoshenko"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r, echo=FALSE, message = FALSE}
+library(Earthquakes4Coursera)
+```
+
+This vignette describes input data and the functions which prepare them for being visualized.
+
+## Input data
+
+Input data are downloaded from [NOAA Significant Earthquake Database](https://www.ngdc.noaa.gov/nndc/struts/form?t=101650&s=1&d=1) and embedded in the project.
+
+## `file_read()` - Reads erthquake data
+
+`file_read()` is used to make reading input data more convenient. Although it can accept a fully qualified file name as an input parameter, by default it reads the data file embedded in the project:
+
+```{r, echo=TRUE, results='asis', message = FALSE}
+NOAA <- file_read()
+```
+
+## `eq_get_date()` - Creates a date from its numeric representation - 
+
+`eq_get_date()` could be easily replaced with other functions like `ISOdate()` for AD dates but it is much more difficult for BC ones. That is where `eq_get_date()` does its job. It has a problem with producing BC leap days (actually the core problem is in R, which believes that it was 0-th year which started AD era) but there are no such dates in the data set. Let me show how it works:
+
+```{r, echo=TRUE, message = TRUE}
+eq_get_date(2018, 05, 20);
+eq_get_date(-2070, 07, 12);
+eq_get_date(2000);
+```
+
+It returns the object of the `POSIXct` class
+
+```{r, echo = TRUE, message = TRUE}
+lubridate::year(eq_get_date(-2070, 07, 12))
+```
+
+## `eq_location_clean()` - Cleans the LOCATION_NAME column
+
+This function helps to clean the LOCATION_NAME column by stripping out the country name (including the colon) and converts names to title case (as opposed to all caps). This will be needed later for annotating visualizations.
+
+```{r, echo = TRUE, message = TRUE}
+eq_location_clean("TURKEY:  IZMIR, EFES")
+```
+
+## `eq_clean_data()` - Cleans NOAA data
+
+This function takes takes raw NOAA data frame and returns a clean data frame. Cleaning means the following:
+
+1. Creates the `DATE` column by uniting the year, month, day and converts it to the Date class (with the help of `eq_get_date()`)
+2. Converts the `LATITUDE` and `LONGITUDE` columns to numeric class
+3. Cleans the `LOCATION_NAME` column by stripping out the country name (including the colon) and converts names to title case (with the help of `eq_location_clean()`)
+
+```{r, echo = TRUE, message = TRUE, results='asis'}
+NOAAC <- eq_clean_data(NOAA)
+knitr::kable(head(NOAAC, 5))
+```
+
+Now the data are clean and ready for being vizualized
