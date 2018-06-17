@@ -14,7 +14,7 @@ eq_get_date(Y, M = 1, D = 1)
 \item{D, }{numerical values to specify a day}
 }
 \value{
-An object of class "\code{\link{POSIXct}}".
+An object of class "\code{\link{Date}}".
 }
 \description{
 In contrast to \code{\link{ISOdate}} it can also define BC dates (at least those

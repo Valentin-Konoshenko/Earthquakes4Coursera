@@ -36,7 +36,7 @@ file_read <- function(filename = "") {
 #' @param M, numerical values to specify a month
 #' @param D, numerical values to specify a day
 #'
-#' @return An object of class "\code{\link{POSIXct}}".
+#' @return An object of class "\code{\link{Date}}".
 #'
 #' @examples
 #'  eq_get_date(-100, 12, 31);
@@ -73,7 +73,7 @@ eq_get_date <- function(Y, M = 1, D = 1) {
 #'
 #' @export
 eq_location_clean <- function(location) {
-  stringr::str_to_title(sub("^.*: *", "", location))
+  stringr::str_to_title(sub("^[^:]*: *", "", location))
 }
 
 #' Cleans NOAA data frame with earthquake related data
