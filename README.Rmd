@@ -1,6 +1,5 @@
 ---
 output: github_document
-always_allow_html: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -72,7 +71,7 @@ NOAAC %>%
 
 ## Example of mapping
 
-```{r mapping, message = FALSE}
+```{r mapping, message = FALSE, eval=FALSE}
 library(lubridate)
 NOAAC %>%
   dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2014) %>%
