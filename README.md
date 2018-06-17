@@ -57,8 +57,7 @@ NOAAC %>%
   ggplot(aes(x = DATE,
              y = COUNTRY,
              color = DEATHS,
-             size = EQ_PRIMARY
-  )) +
+             size = EQ_PRIMARY)) +
   geom_timeline() +
   theme_timeline() +
   labs(size = "Richter scale value", color = "# deaths") +

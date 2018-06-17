@@ -21,7 +21,7 @@ Earthquakes4Coursera has been developed in a context of the Coursera's course "M
 
 You can install Earthquakes4Coursera from github with:
 
-```{r gh-installation, eval = FALSE}
+```{r gh-installation, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("Valentin-Konoshenko/Earthquakes4Coursera")
 ```
@@ -36,7 +36,7 @@ It allows to visualize earthquakes in two ways:
 ## Examples of timelines
 
 This is a basic example of plotting a timeline:
-```{r timeline_basic, message = FALSE, fig.show='hold', fig.width = 7, fig.height = 3.5}
+```{r timeline_basic, message=FALSE, fig.show='asis', fig.width=7, fig.height=3.5}
 library(Earthquakes4Coursera)
 library(dplyr)
 library(ggplot2)
@@ -54,15 +54,14 @@ NOAAC %>%
 ```
 
 The following timeline stratifies the earthquakes by countries:
-```{r timeline_countries, message = FALSE, fig.show='hold', fig.width = 7, fig.height = 7}
+```{r timeline_countries, message=FALSE, fig.show='asis', fig.width=7, fig.height=7}
 NOAAC %>%
   dplyr::filter(COUNTRY %in% c("USA", "CHINA"),
                 between(lubridate::year(DATE),  2008, 2011)) %>%
   ggplot(aes(x = DATE,
              y = COUNTRY,
              color = DEATHS,
-             size = EQ_PRIMARY
-  )) +
+             size = EQ_PRIMARY)) +
   geom_timeline() +
   theme_timeline() +
   labs(size = "Richter scale value", color = "# deaths") +
