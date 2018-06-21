@@ -3,7 +3,7 @@ Title: Visualization of the earthquakes from the NOAA database
 Version: 0.0.1.0001
 Authors@R: person("Valentin", "Konoshenko", email = "konoshenkovalent@ukr.net", role = c("aut", "cre"))
 Description: The package has been developed in a context of the Coursera's course "Mastering Software Development in R Capstone". It visualizes significant earthquakes around the world which are registered in NOAA database.
-Depends: R (>= 3.4.3)
+Depends: R (>= 3.4.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
