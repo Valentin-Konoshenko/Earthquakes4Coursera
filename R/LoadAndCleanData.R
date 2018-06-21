@@ -1,3 +1,5 @@
+globalVariables(".")
+
 #' Read earthquake related data from a file
 #'
 #' The function is supposed to be used to read an embedded file which contains
@@ -97,19 +99,20 @@ eq_location_clean <- function(location) {
 #'
 #' @importFrom dplyr mutate select coalesce
 #' @importFrom magrittr "%>%"
+#' @importFrom rlang .data
 #' @export
 eq_clean_data <- function(df) {
   df %>%
     dplyr::mutate(
-      DATE = eq_get_date(Y = YEAR, M = MONTH, D = DAY),
-      LOCATION_NAME = eq_location_clean(LOCATION_NAME),
-      DEATHS = dplyr::coalesce(as.numeric(DEATHS), NA_real_),
-      EQ_MAG_MS = dplyr::coalesce(as.numeric(EQ_MAG_MS), NA_real_),
-      EQ_PRIMARY = dplyr::coalesce(as.numeric(EQ_PRIMARY), NA_real_),
-      COUNTRY = as.factor(COUNTRY),
-      LATITUDE = as.numeric(LATITUDE),
-      LONGITUDE = as.numeric(LONGITUDE)) %>%
-    dplyr::select(
+      DATE = eq_get_date(Y = .data$YEAR, M = .data$MONTH, D = .data$DAY),
+      LOCATION_NAME = eq_location_clean(.data$LOCATION_NAME),
+      DEATHS = dplyr::coalesce(as.numeric(.data$DEATHS), NA_real_),
+      EQ_MAG_MS = dplyr::coalesce(as.numeric(.data$EQ_MAG_MS), NA_real_),
+      EQ_PRIMARY = dplyr::coalesce(as.numeric(.data$EQ_PRIMARY), NA_real_),
+      COUNTRY = as.factor(.data$COUNTRY),
+      LATITUDE = as.numeric(.data$LATITUDE),
+      LONGITUDE = as.numeric(.data$LONGITUDE)) %>%
+    dplyr::select_(
       "DATE", "LATITUDE", "LONGITUDE", "LOCATION_NAME", "COUNTRY",
       "DEATHS", "TOTAL_DEATHS", "EQ_MAG_MS", "EQ_PRIMARY")
 }
