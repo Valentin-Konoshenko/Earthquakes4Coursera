@@ -5,6 +5,7 @@
 #' of the Coursera's assignment
 #'
 #' @examples
+#' library(ggplot2)
 #' ggplot(mtcars) + geom_point(aes(x = wt, y = mpg)) + theme_timeline()
 #'
 #' @export
@@ -84,6 +85,8 @@ GeomTimeline <- ggplot2::ggproto(
 #'  \item shape}
 #'
 #' @examples
+#' library(dplyr)
+#' library(ggplot2)
 #' #without stratification
 #' file_read() %>%
 #'   eq_clean_data() %>%
@@ -107,7 +110,7 @@ GeomTimeline <- ggplot2::ggproto(
 #'              size = EQ_PRIMARY)) +
 #'   geom_timeline(xmin = eq_get_date(2010, 1, 1),
 #'                 xmax = eq_get_date(2010, 12, 31),
-#                  alpha = 0.4) +
+#'                 alpha = 0.4) +
 #'   theme_timeline() +
 #'   labs(size = "Richter scale value", colour = "# deaths")
 #' @inheritParams ggplot2::geom_ribbon
@@ -179,6 +182,8 @@ GeomTimelineLabel <- ggplot2::ggproto(
 #'  \item n_max}
 #'
 #' @examples
+#' library(dplyr)
+#' library(ggplot2)
 #' #without stratification with 2 greatest earthquakes are annotated
 #' file_read() %>%
 #'   eq_clean_data() %>%

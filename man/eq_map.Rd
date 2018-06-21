@@ -22,6 +22,7 @@ Each earthquake is shown with a circle whose radius is proportional
 to the earthquake's magnitude.
 }
 \examples{
+library(dplyr)
 file_read() \%>\%
   eq_clean_data() \%>\%
   dplyr::filter(COUNTRY == "CHINA" & lubridate::year(DATE) >= 2000) \%>\%

@@ -11,6 +11,7 @@ The theme is built on top \code{\link{theme_bw}} in order to follow the style
 of the Coursera's assignment
 }
 \examples{
+library(ggplot2)
 ggplot(mtcars) + geom_point(aes(x = wt, y = mpg)) + theme_timeline()
 
 }

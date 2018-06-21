@@ -23,6 +23,7 @@ function. The cleaning is performed in the following way:
    (including the colon) and converts names to title case (as opposed to all caps)}
 }
 \examples{
- file_read() \%>\% eq_clean_data()
+library(dplyr)
+file_read() \%>\% eq_clean_data()
 
 }

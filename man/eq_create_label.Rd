@@ -23,9 +23,9 @@ If an earthquake is missing values for any of these items, it is skipped for tha
 of the tag.
 }
 \examples{
+library(dplyr)
 file_read() \%>\%
   eq_clean_data() \%>\%
-  NOAAC \%>\%
   dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2014) \%>\%
   dplyr::mutate(popup_text = eq_create_label(.)) \%>\%
   eq_map(annot_col = "popup_text")

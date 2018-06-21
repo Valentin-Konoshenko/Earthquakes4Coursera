@@ -75,6 +75,8 @@ If \code{n_max} is omitted, each earthquake is annotated
 }
 
 \examples{
+library(dplyr)
+library(ggplot2)
 #without stratification with 2 greatest earthquakes are annotated
 file_read() \%>\%
   eq_clean_data() \%>\%

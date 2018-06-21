@@ -92,10 +92,11 @@ eq_location_clean <- function(location) {
 #' @return Cleaned data frame
 #'
 #' @examples
-#'  file_read() %>% eq_clean_data()
+#' library(dplyr)
+#' file_read() %>% eq_clean_data()
 #'
-#' @importFrom dplyr mutate select coalesce %>%
-#'
+#' @importFrom dplyr mutate select coalesce
+#' @importFrom magrittr "%>%"
 #' @export
 eq_clean_data <- function(df) {
   df %>%

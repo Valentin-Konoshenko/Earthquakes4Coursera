@@ -13,6 +13,7 @@
 #' @param annot_col The column name which should be used for annotation purpose
 #'
 #' @examples
+#' library(dplyr)
 #' file_read() %>%
 #'   eq_clean_data() %>%
 #'   dplyr::filter(COUNTRY == "CHINA" & lubridate::year(DATE) >= 2000) %>%
@@ -20,6 +21,7 @@
 #' @export
 #'
 #' @importFrom leaflet leaflet addTiles addCircleMarkers
+#' @importFrom magrittr "%>%"
 eq_map <- function(eq_data, annot_col){
   annot <- eq_data[[annot_col]] %>% as.character
   leaflet::leaflet() %>%
@@ -47,9 +49,9 @@ eq_map <- function(eq_data, annot_col){
 #' @return An HTML label, which can be used as the annotation text in the leaflet map
 #'
 #' @examples
+#' library(dplyr)
 #' file_read() %>%
 #'   eq_clean_data() %>%
-#'   NOAAC %>%
 #'   dplyr::filter(COUNTRY == "MEXICO" & lubridate::year(DATE) >= 2014) %>%
 #'   dplyr::mutate(popup_text = eq_create_label(.)) %>%
 #'   eq_map(annot_col = "popup_text")

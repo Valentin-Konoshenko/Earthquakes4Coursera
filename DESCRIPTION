@@ -19,7 +19,9 @@ Imports:
     grid,
     leaflet,
     lubridate,
-    readr
+    magrittr,
+    readr,
+    stringr
 Suggests: knitr,
     rmarkdown,
     testthat

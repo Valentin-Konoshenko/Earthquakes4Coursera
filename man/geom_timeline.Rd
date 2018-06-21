@@ -81,6 +81,8 @@ will be plotted for each level of the factor (e.g. country).
 }
 
 \examples{
+library(dplyr)
+library(ggplot2)
 #without stratification
 file_read() \%>\%
   eq_clean_data() \%>\%
@@ -104,6 +106,7 @@ file_read() \%>\%
              size = EQ_PRIMARY)) +
   geom_timeline(xmin = eq_get_date(2010, 1, 1),
                 xmax = eq_get_date(2010, 12, 31),
+                alpha = 0.4) +
   theme_timeline() +
   labs(size = "Richter scale value", colour = "# deaths")
 }
